@@ -55,7 +55,7 @@ var cmd = require("commander"),
 
 cmd
 	.version("0.1.0")
-	.option("-t, --top [rolls]", "Only totals the highest n rolls.");
+	.option("-t, --top [rolls]", "Only totals the highest n rolls in each component.");
 
 cmd
 	.command("roll <roll>")
