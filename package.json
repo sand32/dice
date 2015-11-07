@@ -1,7 +1,7 @@
 {
-	"name": "die-roller",
+	"name": "dice",
 	"version": "0.1.0",
-	"description": "",
+	"description": "Just a quick little terminal dice roller",
 	"private": true,
 	"main": "app.js",
 	"author": "Seth Anderson <seth.anderson32@gmail.com> (https://github.com/sand32)",
