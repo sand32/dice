@@ -1,0 +1,12 @@
+{
+	"name": "die-roller",
+	"version": "0.1.0",
+	"description": "",
+	"private": true,
+	"main": "app.js",
+	"author": "Seth Anderson <seth.anderson32@gmail.com> (https://github.com/sand32)",
+	"license": "zlib/libpng",
+	"dependencies": {
+		"commander": "latest"
+	}
+}
