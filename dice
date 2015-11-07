@@ -1,52 +1,67 @@
 #!/usr/bin/env node
 
 var cmd = require("commander"),
+
+	parseRoll = function(roll){
+		var components = roll.split("+"),
+			result = 0;
+		for(var i = 0; i < components.length; i += 1){
+			result += parseComponent(components[i]);
+		}
+		return result;
+	},
 	
 	parseComponent = function(component){
 		var result = 0, parsed;
 		if(component.indexOf("d") !== -1){
-			var tokens = component.split("d"),
-				rolls = parseInt(tokens[0]),
-				sides = parseInt(tokens[1]),
-				rollList = [];
-
-			if(!rolls){
-				rolls = 1;
-			}
-			if(!sides
-			|| tokens.length > 2){
-				console.log("Error: Unparsable token: \"" + component + "\"");
-				return 0;
-			}
-
-			for(var i = 0; i < rolls; i += 1){
-				rollList.push(rollDie(sides));
-			}
-			if(cmd.top && parseInt(cmd.top)){
-				rollList.sort(function(a, b){
-					if(a < b) return -1;
-					if(a > b) return 1;
-					return 0;
-				});
-				rollList = rollList.slice(rollList.length - parseInt(cmd.top), rollList.length);
-			}
-			result += rollList.reduce(function(a, b){return a + b;});
+			var dice = parseDiceComponent(component);
+			rollList = rollSet(dice.rollCount, dice.sides);
+			if(cmd.verbose) rollList.map(function(val){console.log("d" + dice.sides + ": " + val)});
+			if(cmd.top) rollList = top(rollList, parseInt(cmd.top));
+			result += sum(rollList);
 		}else{
-			parsed = parseInt(component);
-			if(parsed === NaN){
-				console.log("Error: Unparsable token: \"" + component + "\"");
-				return 0;
-			}
-			result += parsed;
-			console.log("Modifier: " + result.toString());
+			result += parseInt(component) || 0;
+			if(cmd.verbose) console.log("Modifier: " + result);
+		}
+		return result;
+	},
+
+	parseDiceComponent = function(component){
+		var tokens = component.split("d");
+		if(tokens.length > 2){
+			console.log("Error: Unparsable token: \"" + component + "\"");
+			process.exit(1);
+		}
+		return {
+			rollCount: parseInt(tokens[0]) || 1,
+			sides: parseInt(tokens[1]) || 0
+		};
+	},
+
+	rollSet = function(rollCount, sides){
+		var result = [];
+		for(var i = 0; i < rollCount; i += 1){
+			result.push(rollDie(sides));
 		}
 		return result;
 	},
 
 	rollDie = function(sides){
-		var roll = Math.floor(Math.random() * (sides - 1) + 1);
-		console.log("d" + sides.toString() + ": " + roll.toString());
-		return roll;
+		return Math.floor(Math.random() * (sides - 1) + 1);
+	},
+
+	sum = function(numberArray){
+		if(numberArray.length === 0) return 0;
+		return numberArray.reduce(function(a, b){return a + b;});
+	},
+
+	top = function(numberArray, topCount){
+		numberArray.sort(function(a, b){
+			if(a < b) return -1;
+			if(a > b) return 1;
+			return 0;
+		});
+		return numberArray.slice(numberArray.length - topCount, numberArray.length);
 	},
 
 	invalidCommandAction = function(){
@@ -55,17 +70,14 @@ var cmd = require("commander"),
 
 cmd
 	.version("0.1.0")
-	.option("-t, --top [rolls]", "Only totals the highest n rolls in each component.");
+	.option("-t, --top [rolls]", "Only totals the highest n rolls in each component.")
+	.option("-v, --verbose", "Shows each roll and modifier value.");
 
 cmd
 	.command("roll <roll>")
 	.description("Rolls the specified dice with the given modifiers. (e.g. 1d6+2d12+5)")
 	.action(function(roll){
-		var components = roll.split("+"), result = 0;
-		for(var i = 0; i < components.length; i += 1){
-			result += parseComponent(components[i]);
-		}
-		console.log("Result: " + result.toString());
+		console.log("Result: " + parseRoll(roll));
 	});
 
 cmd
