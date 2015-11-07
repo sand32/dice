@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var cmd = require("commander"),
 	
 	parseComponent = function(component){
