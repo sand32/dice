@@ -18,6 +18,10 @@ var cmd = require("commander"),
 			rollList = rollSet(dice.rollCount, dice.sides);
 			if(cmd.verbose) rollList.map(function(val){console.log("d" + dice.sides + ": " + val)});
 			if(cmd.top) rollList = top(rollList, parseInt(cmd.top));
+			if(cmd.stats){
+				console.log("Average: " + (sum(rollList) / rollList.length));
+				console.log("Standard Deviation: " + standardDeviation(rollList));
+			}
 			result += sum(rollList);
 		}else{
 			result += parseInt(component) || 0;
@@ -64,12 +68,21 @@ var cmd = require("commander"),
 		return numberArray.slice(numberArray.length - topCount, numberArray.length);
 	},
 
+	standardDeviation = function(numberArray){
+		var mean = sum(numberArray) / numberArray.length,
+			variance = sum(numberArray.map(function(val){
+				return Math.pow(val - mean, 2);
+			})) / numberArray.length;
+		return Math.sqrt(variance);
+	},
+
 	invalidCommandAction = function(){
 		console.log("You must use a valid command.\n\nUse -h for more info.");
 	};
 
 cmd
 	.version("0.1.0")
+	.option("-s, --stats", "Prints out statistical information about the roll.")
 	.option("-t, --top [rolls]", "Only totals the highest n rolls in each component.")
 	.option("-v, --verbose", "Shows each roll and modifier value.");
 
