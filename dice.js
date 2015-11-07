@@ -45,7 +45,7 @@ cmd.version("0.1.0");
 
 cmd
 	.command("roll <roll>")
-	.description("Rolls the specified dice with the given modifiers.")
+	.description("Rolls the specified dice with the given modifiers. (e.g. 1d6+2d12+5)")
 	.action(function(roll){
 		var components = roll.split("+"), result = 0;
 		for(var i = 0; i < components.length; i += 1){
