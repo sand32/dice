@@ -7,7 +7,8 @@ var cmd = require("commander"),
 		if(component.indexOf("d") !== -1){
 			var tokens = component.split("d"),
 				rolls = parseInt(tokens[0]),
-				sides = parseInt(tokens[1]);
+				sides = parseInt(tokens[1]),
+				rollList = [];
 
 			if(!rolls){
 				rolls = 1;
@@ -19,8 +20,17 @@ var cmd = require("commander"),
 			}
 
 			for(var i = 0; i < rolls; i += 1){
-				result += rollDie(sides);
+				rollList.push(rollDie(sides));
 			}
+			if(cmd.top && parseInt(cmd.top)){
+				rollList.sort(function(a, b){
+					if(a < b) return -1;
+					if(a > b) return 1;
+					return 0;
+				});
+				rollList = rollList.slice(rollList.length - parseInt(cmd.top), rollList.length);
+			}
+			result += rollList.reduce(function(a, b){return a + b;});
 		}else{
 			parsed = parseInt(component);
 			if(parsed === NaN){
@@ -43,7 +53,9 @@ var cmd = require("commander"),
 		console.log("You must use a valid command.\n\nUse -h for more info.");
 	};
 
-cmd.version("0.1.0");
+cmd
+	.version("0.1.0")
+	.option("-t, --top [rolls]", "Only totals the highest n rolls.");
 
 cmd
 	.command("roll <roll>")
